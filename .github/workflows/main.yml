@@ -1,0 +1,25 @@
+name: Publish Docker image
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+    - name: Build
+      run: GOOS=linux GOARCH=amd64 go build -a -ldflags "-w -s -X main.version=1" -o .build/tautulli_exporter-linux-amd64
+    - name: Build and push
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        tags: amalgamted-tools/tautulli_exporter:latest
+    - name: Image digest
+      run: echo ${{ steps.docker_build.outputs.digest }}

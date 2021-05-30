@@ -9,22 +9,11 @@ fi
 
 rm .build/*
 
-creator_name="nwalke"
+creator_name="amalgamated-tools"
 package_name="tautulli_exporter"
-full_package_name="$creator_name/$package_name"
-
-platforms=("darwin" "windows" "netbsd" "openbsd" "linux" "freebsd" "plan9")
-
-for i in "${platforms[@]}"; do
-
-  output_name=$package_name'-'$i'-amd64'
-
-  if [ $i = "windows" ]; then
-      output_name+='.exe'
-  fi
-
-  GOOS=$i CGO_ENABLED=0 GOARCH=amd64 go build -a -installsuffix cgo -ldflags "-w -s -X main.version=$version" -o .build/$output_name
-done
+full_package_name="docker.pkg.github.com/$creator_name/$package_name/$package_name"
+output_name=$package_name'-linux-amd64'
+GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags "-w -s -X main.version=$version" -o .build/$output_name
 
 docker build -t $full_package_name .
 docker tag $full_package_name $full_package_name:$version
